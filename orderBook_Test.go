@@ -1,12 +1,16 @@
 package main
 
-import( 
+import (
+	"fmt"
 	"testing"
 )
 
 func TestLimit(t *testing.T){
 	l := NewLimit(10_000)
-	buyOrder := NewOrder(5,true)
+	buyOrder := NewOrder(true,5)
+
+	l.AddOrder(buyOrder)
+	fmt.Println(l)
 }
 
 func TestOrderBook(t *testing.T){
