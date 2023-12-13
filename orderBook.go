@@ -7,8 +7,8 @@ import (
 )
 
 type Match struct{
-	asks 				*Order
-	bids 				*Order
+	Ask 				*Order
+	Bid 				*Order
 	SizeFilled 	float64
 	Price 			float64
 }
@@ -212,17 +212,16 @@ func(ob *OrderBook) PlaceLimitOrder(price float64,o *Order){
 
 	if limit == nil{
 		limit = NewLimit(price)
-		limit.AddOrder(o)
-		
 		if o.Bid{
 			ob.bids = append(ob.asks, limit)
 			ob.BidsLimit[price] = limit
-		}else{
-			ob.asks = append(ob.bids, limit)
-			ob.AsksLimit[price] = limit
+			}else{
+				ob.asks = append(ob.bids, limit)
+				ob.AsksLimit[price] = limit
+			}
 		}
+		limit.AddOrder(o)
 	}
-}
 
 func(ob *OrderBook) clearLimit(bid bool, l *Limit){
 	if bid{
@@ -242,6 +241,11 @@ func(ob *OrderBook) clearLimit(bid bool, l *Limit){
 			}
 		}
 	}
+}
+
+func (ob *OrderBook)CancelOrder(o *Order){
+	limit := o.Limit
+	limit.DeleteOrder(o)
 }
 
 func(ob *OrderBook) BidTotalVolume() float64{
