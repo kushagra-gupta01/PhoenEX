@@ -1,4 +1,4 @@
-package main
+package orderbook
 
 import (
 	"fmt"
@@ -60,7 +60,7 @@ type ByBestBid struct { Limits }
 
 func (b ByBestBid) Len()int 					{return len(b.Limits)}
 func (b ByBestBid) Swap(i,j int)			{b.Limits[i],b.Limits[j] = b.Limits[j],b.Limits[i]}
-func (b ByBestBid) More(i,j int) bool {return b.Limits[i].Price > b.Limits[j].Price}
+func (b ByBestBid) Less(i,j int) bool {return b.Limits[i].Price > b.Limits[j].Price}
 
 func NewLimit(price float64) *Limit{
 	return &Limit{
@@ -175,9 +175,9 @@ func(ob *OrderBook) PlaceMarketOrder(o *Order)[]Match{
 			panic(fmt.Errorf("Not enough volume [size: %.2f] for market order [size: %.2f]",ob.AskTotalVolume(),o.Size))
 		}
 
-		for _,limit := ob.Asks(){
+		for _,limit := range ob.Asks(){
 			limitMatches := limit.Fill(o)
-			matches = append(matches, limitMatches)
+			matches = append(matches, limitMatches...)
 
 			if len(limit.Orders) ==0{
 				ob.clearLimit(true,limit)
@@ -188,9 +188,9 @@ func(ob *OrderBook) PlaceMarketOrder(o *Order)[]Match{
 			panic(fmt.Errorf("Not enough volume [size: %.2f] for market order [size: %.2f]",ob.BidTotalVolume(),o.Size))
 		}
 
-		for _,limit := ob.Bids(){
+		for _,limit := range ob.Bids(){
 			limitMatches := limit.Fill(o)
-			matches = append(matches, limitMatches)
+			matches = append(matches, limitMatches...)
 
 			if len(limit.Orders) ==0{
 				ob.clearLimit(true,limit)
@@ -229,7 +229,7 @@ func(ob *OrderBook) clearLimit(bid bool, l *Limit){
 		for i :=0;i< len(ob.bids);i++{
 			if ob.bids[i] == l{
 				ob.bids[i] = ob.bids[len(ob.bids)-1]
-				ob.bids = ob.bids[:len(ob.bids-1)]
+				ob.bids = ob.bids[:len(ob.bids)-1]
 			}
 		}
 	} else {
@@ -237,7 +237,7 @@ func(ob *OrderBook) clearLimit(bid bool, l *Limit){
 		for i :=0;i< len(ob.asks);i++{
 			if ob.asks[i] == l{
 				ob.asks[i] = ob.asks[len(ob.asks)-1]
-				ob.asks = ob.asks[:len(ob.asks-1)]
+				ob.asks = ob.asks[:len(ob.asks)-1]
 			}
 		}
 	}
