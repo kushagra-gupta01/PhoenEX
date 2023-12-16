@@ -216,10 +216,10 @@ func(ob *OrderBook) PlaceLimitOrder(price float64,o *Order){
 	if limit == nil{
 		limit = NewLimit(price)
 		if o.Bid{
-			ob.bids = append(ob.asks, limit)
+			ob.bids = append(ob.bids, limit)
 			ob.BidsLimit[price] = limit
 			}else{
-				ob.asks = append(ob.bids, limit)
+				ob.asks = append(ob.asks, limit)
 				ob.AsksLimit[price] = limit
 			}
 		}
