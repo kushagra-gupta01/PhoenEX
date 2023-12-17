@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"github.com/kushagra-gupta01/Cryto_Marketplace/orderbook"
@@ -11,6 +12,7 @@ import (
 func main(){
 
 	e := echo.New()
+	// e.HTTPErrorHandler = httpErrorHandler
 	ex := NewExchange()
 	e.GET("/book/:market",ex.handleGetBook)
 	e.POST("/order",ex.handlePlaceOrder)
@@ -126,6 +128,12 @@ func(ex *Exchange) handleGetBook(c echo.Context)error{
 	return c.JSON(http.StatusOK,orderbookData)
 }
 
+type MatchedOrder struct{
+	Price float64
+	Size 	float64
+	ID		int64
+}
+
 func(ex *Exchange) handlePlaceOrder(c echo.Context) error{
 	var placeOrderData PlaceOrderRequest
 
@@ -144,7 +152,25 @@ func(ex *Exchange) handlePlaceOrder(c echo.Context) error{
 
 	if placeOrderData.Type == MarketOrder{
 		matches := ob.PlaceMarketOrder(order)
-		return c.JSON(http.StatusOK,map[string]any{"matches": len(matches)})
+		matchedOrders := make([]*MatchedOrder,len(matches))
+
+		isBid := false
+		if order.Bid{
+			isBid = true
+		}
+
+		for i := 0; i < len(matchedOrders); i++ {
+			id:= matches[i].Bid.ID
+			if isBid{
+				id = matches[i].Ask.ID
+			}
+			matchedOrders[i] = &MatchedOrder{
+				ID: 		id,
+				Size: 	matches[i].SizeFilled,
+				Price: 	matches[i].Price,
+			}
+		}
+		return c.JSON(http.StatusOK,map[string]any{"matches": matchedOrders})
 	}
 
 	return nil
