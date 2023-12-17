@@ -19,6 +19,10 @@ func main(){
 
 }
 
+func httpErrorHandler(err error, c *echo.Context){
+	fmt.Println(err)
+}
+
 type OrderType string
 
 const(
@@ -73,34 +77,10 @@ func (ex* Exchange) cancelOrder(c echo.Context) error{
 	id ,_ := strconv.Atoi(idStr)
 
 	ob := ex.orderbooks[MarketETH]
-	orderCanceled	:= false
+	order := ob.Orders[int64(id)]
+	ob.CancelOrder(order)
 
-	for _,limit := range ob.Asks(){
-		for _,order := range limit.Orders{
-			if order.ID == int64(id){
-				ob.CancelOrder(order)	
-				orderCanceled = true
-			}
-
-			if orderCanceled{
-				return c.JSON(http.StatusOK,map[string]any{"msg":"order canceled"})
-			}
-		}
-	}
-
-	for _,limit := range ob.Bids(){
-		for _,order := range limit.Orders{
-			if order.ID == int64(id){
-				ob.CancelOrder(order)	
-				orderCanceled = true
-			}
-
-			if orderCanceled{
-				return c.JSON(http.StatusOK,map[string]any{"msg":"order canceled"})
-			}
-		}
-	}
-	return nil
+	return c.JSON(http.StatusOK,map[string]any{"msg":"order deleted"})
 }
 
 func(ex *Exchange) handleGetBook(c echo.Context)error{
