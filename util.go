@@ -17,7 +17,7 @@ func transferETH(client *ethclient.Client,fromPrivKey *ecdsa.PrivateKey, to comm
 	publicKey := fromPrivKey.Public()
 	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
 	if !ok{
-		return fmt.Errorf("error casting public key tp ECDSA")
+		return fmt.Errorf("error casting public key to ECDSA")
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
