@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -28,11 +29,12 @@ func transferETH(client *ethclient.Client,fromPrivKey *ecdsa.PrivateKey, to comm
 	}
 	var gasLimit = uint64(21000)
 
+	// chainid := big.NewInt(5777)
 	chainid, err := client.ChainID(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	// log.Panicf("---->%v\n---->%v\n---->%v\n",fromPrivKey,to,chainid)
 
 	tipCap, _ := client.SuggestGasTipCap(ctx)
 	feeCap, _ := client.SuggestGasPrice(ctx)
@@ -49,7 +51,7 @@ func transferETH(client *ethclient.Client,fromPrivKey *ecdsa.PrivateKey, to comm
 			Data:      nil,
 		})
 
-	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chainid), fromPrivKey)
+	signedTx, err := types.SignTx(tx, types.NewLondonSigner(chainid), fromPrivKey)
 	if err !=nil{
 		return err
 	}
