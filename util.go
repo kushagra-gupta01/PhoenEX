@@ -29,12 +29,11 @@ func transferETH(client *ethclient.Client,fromPrivKey *ecdsa.PrivateKey, to comm
 	}
 	var gasLimit = uint64(21000)
 
-	// chainid := big.NewInt(5777)
 	chainid, err := client.ChainID(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// log.Panicf("---->%v\n---->%v\n---->%v\n",fromPrivKey,to,chainid)
+
 
 	tipCap, _ := client.SuggestGasTipCap(ctx)
 	feeCap, _ := client.SuggestGasPrice(ctx)
